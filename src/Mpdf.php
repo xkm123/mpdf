@@ -23,6 +23,26 @@ use Psr\Log\NullLogger;
  * based on FPDF by Olivier Plathey
  *      and HTML2FPDF by Renato Coelho
  *
+ *
+ * $defaultConfig = (new Mpdf\Config\ConfigVariables())->getDefaults();
+ * $fontDirs = $defaultConfig['fontDir'];
+ * $defaultFontConfig = (new Mpdf\Config\FontVariables())->getDefaults();
+ * $fontData = $defaultFontConfig['fontdata'];
+ * $mpdf = new \Mpdf\Mpdf([
+ * 'mode' => '+aCJK',
+ * 'fontDir' => array_merge($fontDirs, [__DIR__ . '/fonts']),
+ * 'fontdata' => $fontData +
+ * [
+ * 'msyh' => [
+ * 'R' => 'msyh.ttf',
+ * ],
+ *
+ * ],
+ * 'default_font' => 'msyh'
+ * ]);
+ * $mpdf->autoScriptToLang = true;
+ * $mpdf->autoLangToFont = true;
+ *
  * @license GPL-2.0
  */
 class Mpdf implements \Psr\Log\LoggerAwareInterface
@@ -38,7 +58,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 
 	const OBJECT_IDENTIFIER = "\xbb\xa4\xac";
 
-    var $watermarks=[];
+    protected $watermarks=[];
 
 	var $useFixedNormalLineHeight; // mPDF 6
 	var $useFixedTextBaseline; // mPDF 6
@@ -13091,6 +13111,20 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
             $watermark instanceof \Mpdf\WatermarkImage){
             $this->watermarks[]=$watermark;
         }
+    }
+    function SetWatermarks(array $watermarks)
+    {
+        $this->watermarks=[];
+        foreach ($watermarks as $watermark){
+            if ($watermark instanceof \Mpdf\WatermarkText||
+                $watermark instanceof \Mpdf\WatermarkImage){
+                $this->watermarks[]=$watermark;
+            }
+        }
+    }
+    function GetWatermarks()
+    {
+        return $this->watermarks;
     }
 	/* -- END WATERMARK -- */
 
